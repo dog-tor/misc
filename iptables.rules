@@ -1,0 +1,87 @@
+# My Linux iptables firewall
+
+# FILTER CHAIN - connections with NO MATCHING RULE are DROPPED
+*filter
+:INPUT DROP [2442:176492]
+:FORWARD DROP [0:0]
+:OUTPUT DROP [3621:370434]
+
+# NAT CHAIN - connections with NO MATCHING RULE are DROPPED
+*nat
+:PREROUTING DROP [0:0]
+:INPUT DROP [0:0]
+:OUTPUT DROP [0:0]
+:POSTROUTING DROP [0:0]
+COMMIT
+
+# RULES
+
+# Allow ssguard
+#-A INPUT -j sshguard
+
+# Allow traffic on Loopback interface
+-A INPUT -i lo -j ACCEPT
+-A OUTPUT -o lo -j ACCEPT
+
+# Echo Request
+-A INPUT -s 192.168.0.0/22 -d 192.168.0.0/22 -p icmp -m icmp --icmp-type echo-request -j ACCEPT
+-A OUTPUT -s 192.168.0.0/22 -d 0.0.0.0/0 -p icmp -m icmp --icmp-type echo-request -j ACCEPT
+
+# Echo Reply
+-A INPUT -s 0.0.0.0/0 -d 192.168.0.0/22 -p icmp -m icmp --icmp-type echo-reply -j ACCEPT
+-A OUTPUT -s 192.168.0.0/22 -d 192.168.0.0/22 -p icmp -m icmp --icmp-type echo-reply -j ACCEPT
+
+# HTTP Client out
+#-A OUTPUT -s 192.168.0.0/22 -d 0.0.0.0/0 -p tcp -m tcp --dport 80 -j ACCEPT
+#-A INPUT -s 0.0.0.0/0 -d 192.168.0.0/22 -p tcp -m tcp --sport 80 -j ACCEPT
+# HTTP Server In
+#-A INPUT -s 0.0.0.0/0 -d 192.168.0.0/22 -p tcp -m tcp --dport 80 -j ACCEPT
+#-A OUTPUT -s 192.168.0.0/22 -d 0.0.0.0/0 -p tcp -m tcp --sport 80 -j ACCEPT
+
+# HTTPS Client out
+-A OUTPUT -s 192.168.0.0/22 -d 0.0.0.0/0 -p tcp -m tcp --dport 443 -j ACCEPT
+-A INPUT -s 0.0.0.0/0 -d 192.168.0.0/22 -p tcp -m tcp --sport 443 -j ACCEPT
+# HTTPS Server In
+-A INPUT -s 192.168.0.0/22 -d 192.168.0.0/22 -p tcp -m tcp --dport 443 -j ACCEPT
+-A OUTPUT -s 192.168.0.0/22 -d 192.168.0.0/22 -p tcp -m tcp --sport 443 -j ACCEPT
+
+# FTP Client out
+#-A OUTPUT -s 192.168.0.0/22 -d 0.0.0.0/0 -p tcp -m tcp --dport 21 -j ACCEPT
+#-A INPUT -s 0.0.0.0/0 -d 192.168.0.0/22 -p tcp -m tcp --sport 21 -j ACCEPT
+# FTP Server In
+#-A INPUT -s 192.168.0.0/22 -d 192.168.0.0/22 -p tcp -m tcp --dport 21 -j ACCEPT
+#-A OUTPUT -s 192.168.0.0/22 -d 192.168.0.0/22 -p tcp -m tcp --sport 21 -j ACCEPT
+
+# DNS Client Out
+-A OUTPUT -s 192.168.0.0/22 -d 0.0.0.0/0 -p udp --dport 53 -j ACCEPT
+-A INPUT -s 0.0.0.0/0 -d 192.168.0.0/22 -p udp --sport 53 -j ACCEPT
+
+# MySQL Client Out
+#-A OUTPUT -s 192.168.0.0/22 -d 0.0.0.0/0 -p tcp -m tcp --dport 3306 -j ACCEPT
+#-A INPUT -s 0.0.0.0/0 -d 192.168.0.0/22 -p tcp -m tcp --sport 3306 -j ACCEPT
+# MySQL Server In
+#-A INPUT -s 192.168.0.0/22 -d 192.168.0.0/22 -p tcp -m tcp --dport 3306 -j ACCEPT
+#-A OUTPUT -s 192.168.0.0/22 -d 192.168.0.0/22 -p tcp -m tcp --sport 3306 -j ACCEPT
+
+# Microsoft Directory Service Client Out
+#-A OUTPUT -s 192.168.0.0/22 -d 192.168.0.0/22 -p tcp -m tcp --dport 445 -j ACCEPT
+#-A INPUT -s 192.168.0.0/22 -d 192.168.0.0/22 -p tcp -m tcp --sport 445 -j ACCEPT
+# Microsoft Directory Service Server In
+-A INPUT -s 192.168.0.0/22 -d 192.168.0.0/22 -p tcp -m tcp --dport 445 -j ACCEPT
+-A OUTPUT -s 192.168.0.0/22 -d 192.168.0.0/22 -p tcp -m tcp --sport 445 -j ACCEPT
+
+# SSH Client Out
+-A OUTPUT -s 192.168.0.0/22 -d 0.0.0.0/0 -p tcp -m tcp --dport 22 -j ACCEPT
+-A INPUT -s 0.0.0.0/0 -d 192.168.0.0/22 -p tcp -m tcp --sport 22 -j ACCEPT
+# SSH Server In
+-A INPUT -s 192.168.0.0/22 -d 192.168.0.0/22 -p tcp -m tcp --dport 22 -j ACCEPT
+-A OUTPUT -s 192.168.0.0/22 -d 192.168.0.0/22 -p tcp -m tcp --sport 22 -j ACCEPT
+
+# SNMPTRAP Server In
+#-A INPUT -s 192.168.0.0/22 -d 192.168.0.0/22 -p udp -m udp --dport 162 -j ACCEPT
+#-A OUTPUT -s 192.168.0.0/22 -d 192.168.0.0/22 -p udp -m udp --sport 162 -j ACCEPT
+# SNMP Agent/Server? In
+#-A INPUT -s 192.168.0.0/22 -d 192.168.0.0/22 -p udp -m udp --dport 161 -j ACCEPT
+#-A OUTPUT -s 192.168.0.0/22 -d 192.168.0.0/22 -p udp -m udp --sport 161 -j ACCEPT
+
+COMMIT
