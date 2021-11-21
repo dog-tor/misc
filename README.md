@@ -1,2 +1,2 @@
 # Misc
-This repository contains some security configurations and commands I have saved over the years.
+This repository contains some security configurations such as iptables firewall settings and commands I have saved over the years.
